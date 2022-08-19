@@ -1,0 +1,188 @@
+C51 COMPILER V9.60.0.0   MAIN                                                              04/12/2021 12:27:39 PAGE 1   
+
+
+C51 COMPILER V9.60.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #pragma large
+   2          #include <at89c5131.h>
+   3          #include <stdlib.h>
+   4          #include "lcd.h"    //Header file with LCD interfacing functions
+   5          #include "serial.c" //C file with UART interfacing functions
+   6          
+   7          unsigned int Randoms(unsigned int lower, unsigned int upper)
+   8          {
+   9   1          unsigned int num;
+  10   1          num = (rand() % (upper - lower + 1)) + lower;
+  11   1        return num;
+  12   1              
+  13   1          
+  14   1      }
+  15          unsigned int index( unsigned char temp[], unsigned int idx[], unsigned char ch)
+  16          {
+  17   1        unsigned int i;
+  18   1        unsigned int k=1;
+  19   1        unsigned int len=0;
+  20   1          for(i=1;i<=7;i++)
+  21   1        {
+  22   2          if(temp[i] == ch)
+  23   2          {
+  24   3            idx[k]=i;
+  25   3            k=k+1;
+  26   3            len = len +1;
+  27   3          }
+  28   2        }
+  29   1        return len;
+  30   1      }
+  31          
+  32          
+  33          //Main function
+  34          void main(void)
+  35          {
+  36   1        unsigned char ch=0;
+  37   1        unsigned char temp[8];
+  38   1        unsigned int idx[7]={0};
+  39   1       code unsigned char str[100][8]= {"0acid111","0army111","0ball111","0beer111",
+  40   1          "0boat111","0cash111","0city111","0door111","0drug111","0evil111","0farm111","0goal111","0hole111",
+  41   1          "0iron111","0john111","0kent111","0logo111","0mass111","0nine111","0oral111","0pain111","0pubg111","0pur
+             -e111","0race111","0rain111",
+  42   1          "0snow111","0tank111","0user111","0vote111","0walk111","0yard111","0zero111","0zone111","0jazzy11","0piz
+             -za11","0adult11","0alarm11","0apple11","0bitch11","0beach11","0chair11","0china11","0death11","0earth11",
+  43   1          "0flash11","0green11","0harry11","0input11","0japan11","0known11","0laugh11","0magic11","0money11","0noi
+             -ce11","0ocean11",
+  44   1          "0paper11","0parin11","0phone11","0queen11","0roger11","0scope11","0teeth11","0urban11","0virus11","0whe
+             -el11","0world11","0yield11","0youth11",
+  45   1          "0aniket1","0ayush11","0shaan11","0vineet1","0abroad1","0author1","0beauty1","0coffee1","0design1","0ene
+             -rgy1","0father1","0french1","0global1",
+  46   1          "0honest1","0island1","0jersey1","0lesson1","0matter1","0number1","0oxford1","0palace1","0planet1","0rat
+             -ing1","0school1","0twelve1","0unique1","0vision1",
+  47   1          "0wholly1","0yellow1","0writer1","0switch1","0tender1"};
+  48   1          
+C51 COMPILER V9.60.0.0   MAIN                                                              04/12/2021 12:27:39 PAGE 2   
+
+  49   1        
+  50   1          
+  51   1        unsigned int a;
+  52   1        unsigned int i,j;
+  53   1        unsigned int b;
+  54   1        unsigned int c ;
+  55   1        unsigned char cha;
+  56   1        unsigned int corrguess, wrongguess,length;
+  57   1        
+  58   1        while(1)
+  59   1        {
+  60   2         a = Randoms(0,99);
+  61   2         corrguess=0;
+  62   2          wrongguess=0;
+  63   2          length=0;
+  64   2          for(j=0;j<=7;j++)
+  65   2          {
+  66   3            temp[j]=str[a][j];
+  67   3          }
+  68   2        
+  69   2        for(i=1;i<=7;i++)
+  70   2        {
+  71   3          if(temp[i] !='1')
+  72   3          {
+  73   4            length= length +1;
+  74   4          }
+  75   3          else
+  76   3          {
+  77   4          break;
+  78   4          }
+  79   3        }
+  80   2        
+  81   2        //Call initialization functions
+  82   2        lcd_init();
+  83   2        uart_init();
+  84   2        lcd_cmd(1);
+  85   2        msdelay(10);
+  86   2        lcd_cmd(133);
+  87   2        msdelay(10);
+  88   2        for(i=1;i<=length;i++)
+  89   2        {
+  90   3          lcd_write_char('_');
+  91   3        }
+  92   2        lcd_cmd(192);
+  93   2        msdelay(10);
+  94   2        lcd_write_string("WrongGuesses - 0");
+  95   2        
+  96   2        
+  97   2        while(corrguess!=length && wrongguess!=6)
+  98   2        {
+  99   3            
+ 100   3            ch = receive_char();
+ 101   3           
+ 102   3            idx[0]= index(temp,idx,ch);
+ 103   3          
+ 104   3          
+ 105   3          
+ 106   3           if(idx[0]!=0)
+ 107   3           {
+ 108   4             for(i=1;i<=idx[0];i++)
+ 109   4             {
+ 110   5             corrguess= corrguess +1;
+C51 COMPILER V9.60.0.0   MAIN                                                              04/12/2021 12:27:39 PAGE 3   
+
+ 111   5               b= idx[i];
+ 112   5             
+ 113   5             c= 132 + b;
+ 114   5             lcd_cmd(c);
+ 115   5             lcd_write_char(ch);
+ 116   5             transmit_char(ch);
+ 117   5             temp[b] = '0';
+ 118   5             }
+ 119   4           }
+ 120   3           else
+ 121   3           {
+ 122   4             wrongguess= wrongguess +1;
+ 123   4             lcd_cmd(207);
+ 124   4              cha = '0' + wrongguess;
+ 125   4             lcd_write_char(cha);
+ 126   4           }
+ 127   3             
+ 128   3          
+ 129   3            msdelay(1000);
+ 130   3        }
+ 131   2        if(corrguess==length)
+ 132   2        {
+ 133   3          lcd_cmd(1);
+ 134   3          msdelay(10);
+ 135   3          lcd_cmd(132);
+ 136   3          lcd_write_string("You Won");
+ 137   3          
+ 138   3        }
+ 139   2        else if(wrongguess==6)
+ 140   2        {
+ 141   3          lcd_cmd(1);
+ 142   3          msdelay(10);
+ 143   3          lcd_cmd(132);
+ 144   3          lcd_write_string("You Lost");
+ 145   3          
+ 146   3        }
+ 147   2        for(j=0;j<7;j++)
+ 148   2        {
+ 149   3          idx[j]=0;
+ 150   3        }
+ 151   2        
+ 152   2        msdelay(5000);
+ 153   2      }
+ 154   1        }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1164    ----
+   CONSTANT SIZE    =    848    ----
+   XDATA SIZE       =   ----      59
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      2    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
